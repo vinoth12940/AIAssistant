@@ -11,15 +11,20 @@ def extract_response(result):
             except json.JSONDecodeError:
                 return result.strip()
 
-        if isinstance(result, dict) and 'tasks_output' in result:
-            conversation_output = result['tasks_output'][0]
-            if isinstance(conversation_output, dict):
-                return conversation_output.get('raw', '')
-            elif hasattr(conversation_output, 'raw'):
-                return conversation_output.raw
+        if isinstance(result, dict):
+            # Handle dictionary result
+            if 'tasks_output' in result:
+                # Get the final response from the conversation agent
+                conversation_output = result['tasks_output'][-1]
+                if isinstance(conversation_output, dict):
+                    return conversation_output.get('output', conversation_output.get('raw', ''))
+                return str(conversation_output)
+            elif 'output' in result:
+                return result['output']
+            
         return str(result).strip()
-    except Exception:
-        return str(result).strip()
+    except Exception as e:
+        return f"I apologize, but I encountered an error processing the response. Error: {str(e)}"
 
 def run_ui():
     # Page configuration
@@ -252,13 +257,17 @@ def run_ui():
             with st.spinner("Processing..."):
                 result = st.session_state.crew.crew().kickoff(inputs={'topic': prompt})
                 response = extract_response(result)
+                if not response or response.isspace():
+                    response = "I apologize, but I couldn't generate a proper response. Please try asking your question in a different way."
             
             with st.chat_message("assistant", avatar="🤖"):
                 st.markdown(f"<div style='color: white;'>{response}</div>", unsafe_allow_html=True)
             st.session_state.chat_history.append(("assistant", response))
 
         except Exception as e:
-            st.error("Something went wrong. Please try again.")
+            error_msg = f"I apologize, but something went wrong: {str(e)}\nPlease try again or rephrase your question."
+            st.error(error_msg)
+            st.session_state.chat_history.append(("assistant", error_msg))
 
     st.markdown("</div>", unsafe_allow_html=True)
 

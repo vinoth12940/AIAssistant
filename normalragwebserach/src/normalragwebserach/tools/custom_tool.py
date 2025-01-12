@@ -1,19 +1,22 @@
-from crewai.tools import BaseTool
-from typing import Type
-from pydantic import BaseModel, Field
+from crewai_tools import DirectoryReadTool, FileReadTool
+from pathlib import Path
 
+class CustomerDataTool:
+    def __init__(self, knowledge_dir: Path):
+        self.directory_tool = DirectoryReadTool(directory=str(knowledge_dir))
+        self.file_tool = FileReadTool()
+        self.knowledge_dir = knowledge_dir
 
-class MyCustomToolInput(BaseModel):
-    """Input schema for MyCustomTool."""
-    argument: str = Field(..., description="Description of the argument.")
-
-class MyCustomTool(BaseTool):
-    name: str = "Name of my tool"
-    description: str = (
-        "Clear description for what this tool is useful for, your agent will need this information to use it."
-    )
-    args_schema: Type[BaseModel] = MyCustomToolInput
-
-    def _run(self, argument: str) -> str:
-        # Implementation goes here
-        return "this is an example of a tool output, ignore it and move along."
+    def search_customer_data(self, query: str) -> str:
+        """Search customer information from the knowledge base"""
+        try:
+            # First try to read from the directory
+            dir_results = self.directory_tool.run(query)
+            
+            # Then try to read specific customer file
+            csv_path = self.knowledge_dir / 'customers-100.csv'
+            file_results = self.file_tool.run(str(csv_path))
+            
+            return f"{dir_results}\n\n{file_results}"
+        except Exception as e:
+            return f"Error searching customer data: {str(e)}"
