@@ -1,31 +1,46 @@
-conversation_task:
+analyze_query_task:
   description: >
-    Engage in natural conversation about {topic}.
-    If it's a simple query (greeting, basic question):
-      - Respond directly and naturally
-    If it requires user context:
-      - Check knowledge base first
-    If it requires specific information:
-      - Search the web only if needed
-    Always:
-      - Keep responses natural and concise
-      - No meta-commentary or feedback requests
-      - No showing of work process
+    Analyze the user's query: "{topic}"
+    Determine what type of response is needed:
+    1. If it's a knowledge base query (about customers, products, or documentation)
+    2. If it needs web search (current events, general information)
+    3. If it's a coding question
+    4. If it's just a normal conversation
+    Provide your analysis and recommendation for how to handle the query.
   expected_output: >
-    Natural conversational response
+    A clear analysis of the query type and recommended action,
+    formatted as markdown with the decision and reasoning.
   agent: conversation_agent
 
 knowledge_task:
   description: >
-    Quickly retrieve relevant information from local knowledge when requested
+    Search the knowledge directory for information about: {topic}.
+    Only proceed if the query requires knowledge base information.
+    Focus on finding relevant customer data and documentation.
   expected_output: >
-    Concise, relevant information from knowledge base
+    A detailed report of relevant information found in the knowledge base,
+    formatted as markdown with clear sections and bullet points.
   agent: knowledge_agent
 
 search_task:
   description: >
-    Search the web only when information isn't available locally
+    Search the web for information about: {topic}.
+    Only proceed if the query requires current or external information.
+    Focus on finding accurate and up-to-date information.
   expected_output: >
-    Relevant web information when needed
+    A comprehensive summary of web search results,
+    formatted as markdown with clear sections and key points.
   agent: search_agent
+
+conversation_task:
+  description: >
+    Based on the query analysis and any gathered information, provide a response to: "{topic}".
+    If it's a normal conversation, respond naturally and engagingly.
+    If it's a knowledge query, use the knowledge base results.
+    If it's a web search query, use the search results.
+    If it's a coding question, provide a clear technical response.
+  expected_output: >
+    A clear, appropriate response based on the query type and available information,
+    formatted in a user-friendly way with proper markdown formatting.
+  agent: conversation_agent
 
