@@ -1,0 +1,25 @@
+[project]
+name = "normalragwebserach"
+version = "0.1.0"
+description = "NormalRagWebserach using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "crewai[tools]>=0.95.0,<1.0.0",
+    "streamlit>=1.24.0",
+]
+
+[project.scripts]
+normalragwebserach = "normalragwebserach.main:run"
+normalragwebserach-cli = "normalragwebserach.main:run_cli"
+run_crew = "normalragwebserach.main:run_cli"
+train = "normalragwebserach.main:train"
+replay = "normalragwebserach.main:replay"
+test = "normalragwebserach.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
