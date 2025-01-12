@@ -2,45 +2,94 @@ analyze_query_task:
   description: >
     Analyze the user's query: "{topic}"
     Determine what type of response is needed:
-    1. If it's a knowledge base query (about customers, products, or documentation)
-    2. If it needs web search (current events, general information)
-    3. If it's a coding question
-    4. If it's just a normal conversation
-    Provide your analysis and recommendation for how to handle the query.
+    1. If it's a knowledge base query:
+       - Questions about specific customers (e.g., names like "Olsen", "Smith", etc.)
+       - Questions about customer details (phone, country, email, etc.)
+       - Questions about products or documentation
+    2. If it needs web search:
+       - Current events or news
+       - General information not about specific customers
+       - Public information about companies or people
+    3. If it's a coding question:
+       - Technical questions
+       - Programming related queries
+    4. If it's just a normal conversation:
+       - Greetings
+       - General chit-chat
+       - Opinion questions
+    
+    IMPORTANT: Return your analysis in this exact format:
+    ```
+    TYPE: [KNOWLEDGE_BASE|WEB_SEARCH|CODING|CONVERSATION]
+    REASON: [Your explanation why]
+    ```
   expected_output: >
-    A clear analysis of the query type and recommended action,
-    formatted as markdown with the decision and reasoning.
+    A structured analysis of the query type with exact format specified.
   agent: conversation_agent
 
 knowledge_task:
   description: >
-    Search the knowledge directory for information about: {topic}.
-    Only proceed if the query requires knowledge base information.
-    Focus on finding relevant customer data and documentation.
+    IMPORTANT: First check the query analysis output in query_analysis.md.
+    ONLY proceed if the analysis type is "KNOWLEDGE_BASE", otherwise return "SKIP: Not a knowledge base query".
+    
+    If proceeding:
+    1. Use the directory tool to list available files
+    2. Use the file tool to read relevant files, especially customers-100.csv
+    3. Search for information about: {topic}
+    4. Return ONLY information found in the knowledge base
+    
+    IMPORTANT: For customer queries:
+    - Always check customers-100.csv first
+    - Look for exact and partial name matches
+    - Return all relevant customer information found
   expected_output: >
-    A detailed report of relevant information found in the knowledge base,
-    formatted as markdown with clear sections and bullet points.
+    Either the found information from knowledge base or skip message if not applicable.
   agent: knowledge_agent
 
 search_task:
   description: >
-    Search the web for information about: {topic}.
-    Only proceed if the query requires current or external information.
-    Focus on finding accurate and up-to-date information.
+    IMPORTANT: First check the query analysis output in query_analysis.md.
+    ONLY proceed if the analysis type is "WEB_SEARCH" AND the knowledge task returned no results.
+    Return "SKIP: Not a web search query" if either:
+    - Analysis type is not WEB_SEARCH
+    - Knowledge task found relevant information
+    
+    If proceeding:
+    1. Use the SerperDev search tool to find current information
+    2. Use the website tool to get more details if needed
+    3. Format results with sources
   expected_output: >
-    A comprehensive summary of web search results,
-    formatted as markdown with clear sections and key points.
+    Either web search results with sources, or skip message if not applicable.
   agent: search_agent
 
 conversation_task:
   description: >
-    Based on the query analysis and any gathered information, provide a response to: "{topic}".
-    If it's a normal conversation, respond naturally and engagingly.
-    If it's a knowledge query, use the knowledge base results.
-    If it's a web search query, use the search results.
-    If it's a coding question, provide a clear technical response.
+    IMPORTANT: For KNOWLEDGE_BASE queries:
+    1. Check knowledge_output.md
+    2. If customer information is found, return it EXACTLY as found
+    3. Do not modify or reformat the information
+    4. Do not add any additional text or context
+    5. Only if no information is found, treat as conversation
+    
+    For other query types:
+    1. For WEB_SEARCH:
+       - First check knowledge_output.md for local info
+       - If no local info, check search_output.md
+       - Format results with sources
+    
+    2. For CODING:
+       - Provide technical response
+       - Use examples when possible
+    
+    3. For CONVERSATION:
+       - Respond naturally and engagingly
+       - No need to search or check files
+    
+    Query: {topic}
   expected_output: >
-    A clear, appropriate response based on the query type and available information,
-    formatted in a user-friendly way with proper markdown formatting.
+    For KNOWLEDGE_BASE: The exact customer information without any modifications
+    For WEB_SEARCH: Search results with sources
+    For CODING: Technical explanation with examples
+    For CONVERSATION: Natural dialogue response
   agent: conversation_agent
 

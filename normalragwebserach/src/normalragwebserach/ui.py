@@ -5,24 +5,27 @@ import json
 def extract_response(result):
     """Extract the actual response from the crew result"""
     try:
-        if isinstance(result, str):
-            try:
-                result = json.loads(result)
-            except json.JSONDecodeError:
-                return result.strip()
-
-        if isinstance(result, dict):
-            # Handle dictionary result
-            if 'tasks_output' in result:
-                # Get the final response from the conversation agent
-                conversation_output = result['tasks_output'][-1]
-                if isinstance(conversation_output, dict):
-                    return conversation_output.get('output', conversation_output.get('raw', ''))
-                return str(conversation_output)
-            elif 'output' in result:
-                return result['output']
+        # Convert result to string and clean it up
+        response = str(result).strip()
+        
+        # If it's a knowledge base result, return as is
+        if '```' in response and any(field in response for field in ['First Name:', 'Last Name:', 'Phone:', 'Country:']):
+            return response
             
-        return str(result).strip()
+        # For analysis results, only return if explicitly requested
+        if 'TYPE:' in response and 'REASON:' in response:
+            return response
+            
+        # For SKIP messages, ignore them
+        if response.startswith('SKIP:'):
+            return ''
+            
+        # Remove any remaining markdown code blocks
+        if '```' in response:
+            response = response.split('```')[-2] if len(response.split('```')) > 2 else response.replace('```', '')
+            
+        return response.strip()
+        
     except Exception as e:
         return f"I apologize, but I encountered an error processing the response. Error: {str(e)}"
 
@@ -255,7 +258,7 @@ def run_ui():
 
         try:
             with st.spinner("Processing..."):
-                result = st.session_state.crew.crew().kickoff(inputs={'topic': prompt})
+                result = st.session_state.crew.kickoff(prompt)
                 response = extract_response(result)
                 if not response or response.isspace():
                     response = "I apologize, but I couldn't generate a proper response. Please try asking your question in a different way."

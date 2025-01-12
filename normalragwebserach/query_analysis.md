@@ -1,0 +1,1 @@
+``` TYPE: WEB_SEARCH REASON: The user's query "Can you tell what is happening in Los Angeles?" seeks current information about events or news happening in a specific location, which typically requires a web search for up-to-date information. ```
