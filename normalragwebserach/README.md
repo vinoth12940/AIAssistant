@@ -1,54 +1,143 @@
-# Normalragwebserach Crew
+# AI Assistant with CrewAI
 
-Welcome to the Normalragwebserach Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+A powerful multi-agent AI system powered by [crewAI](https://crewai.com) that combines knowledge base search, web research, and intelligent conversation capabilities.
 
-## Installation
+## Quick Start
 
-Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+### Prerequisites
+- Python >=3.10 <3.13
+- Conda (Miniconda or Anaconda)
+- Git
+- API Keys:
+  - [OpenAI API Key](https://platform.openai.com)
+  - [Serper API Key](https://serper.dev)
 
-First, if you haven't already, install uv:
+### Installation
 
+1. Clone and navigate:
 ```bash
-pip install uv
+git clone https://github.com/vinoth12940/AIAssistant.git
+cd AIAssistant
 ```
 
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
+2. Set up environment:
 ```bash
-crewai install
-```
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/normalragwebserach/config/agents.yaml` to define your agents
-- Modify `src/normalragwebserach/config/tasks.yaml` to define your tasks
-- Modify `src/normalragwebserach/crew.py` to add your own logic, tools and specific args
-- Modify `src/normalragwebserach/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
-```bash
-$ crewai run
+conda create -n normalragwebserach python=3.11
+conda activate normalragwebserach
 ```
 
-This command initializes the NormalRagWebserach Crew, assembling the agents and assigning them tasks as defined in your configuration.
+3. Install project:
+```bash
+cd AIAssistant/normalragwebserach
+pip install -e .
+```
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+4. Configure environment:
+Create `.env` file in the normalragwebserach directory:
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+SERPER_API_KEY=your_serper_api_key_here
+MODEL=gpt-4-0125-preview
+```
 
-## Understanding Your Crew
+### Run Application
+```bash
+conda activate normalragwebserach
+streamlit run src/normalragwebserach/ui.py
+```
+Access at http://localhost:8501
 
-The NormalRagWebserach Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+## Features
 
-## Support
+- **Intelligent Query Processing**: Automatically identifies query type and routes to appropriate agent
+- **Multi-Agent System**: Specialized agents for different tasks working in coordination
+- **Knowledge Base Integration**: Local database search for customer information
+- **Web Research**: Real-time internet search and content analysis
+- **Interactive UI**: User-friendly Streamlit interface
+- **Extensible Architecture**: Easy to customize and extend
 
-For support, questions, or feedback regarding the Normalragwebserach Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+## System Architecture
 
-Let's create wonders together with the power and simplicity of crewAI.
+### Agents
+
+1. **Conversation Agent**
+   - Primary coordinator
+   - Query analysis
+   - Response formatting
+
+2. **Knowledge Base Expert**
+   - Local database operations
+   - Customer data retrieval
+   - Documentation search
+
+3. **Web Research Expert**
+   - Internet searches
+   - Content retrieval
+   - Source verification
+
+### Query Types
+
+1. **Knowledge Base Queries**
+   - Customer information
+   - Product details
+   - Documentation
+
+2. **Web Search Queries**
+   - Current events
+   - General information
+   - Research topics
+
+3. **Coding Questions**
+   - Technical help
+   - Implementation guidance
+   - Code examples
+
+4. **Conversational**
+   - General chat
+   - Opinions
+   - Assistance
+
+## Technical Implementation
+
+### Task Flow
+1. Query Analysis → query_analysis.md
+2. Information Retrieval (based on type):
+   - Knowledge Base Search → knowledge_output.md
+   - Web Search → search_output.md
+3. Response Generation → conversation_output.md
+
+### CrewAI Integration
+```python
+# Two-Phase Execution
+1. Analysis Phase:
+   - Single agent (conversation_agent)
+   - Query type determination
+
+2. Task Phase:
+   - Multiple agents
+   - Dynamic task selection
+   - Sequential processing
+```
+
+## Customization
+
+Modify these files to customize behavior:
+- `src/normalragwebserach/config/agents.yaml`: Agent definitions
+- `src/normalragwebserach/config/tasks.yaml`: Task configurations
+- `src/normalragwebserach/crew.py`: Core logic
+- `src/normalragwebserach/main.py`: Input handling
+
+## Performance Optimization
+
+For better performance:
+```bash
+xcode-select --install  # macOS only
+pip install watchdog
+```
+
+## Support & Resources
+
+- [CrewAI Documentation](https://docs.crewai.com)
+- [GitHub Repository](https://github.com/joaomdmoura/crewai)
+- [Discord Community](https://discord.com/invite/X4JWnZnxPb)
+- [Documentation Chat](https://chatg.pt/DWjSBZn)
