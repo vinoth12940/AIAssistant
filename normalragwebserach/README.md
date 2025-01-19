@@ -5,6 +5,7 @@ A powerful multi-agent AI system powered by [crewAI](https://crewai.com) that co
 ## Quick Start
 
 ### Prerequisites
+
 - Python >=3.10 <3.13
 - Conda (Miniconda or Anaconda)
 - Git
@@ -15,25 +16,29 @@ A powerful multi-agent AI system powered by [crewAI](https://crewai.com) that co
 ### Installation
 
 1. Clone and navigate:
+
 ```bash
 git clone https://github.com/vinoth12940/AIAssistant.git
 cd AIAssistant
 ```
 
 2. Set up environment:
+
 ```bash
 conda create -n normalragwebserach python=3.11
 conda activate normalragwebserach
 ```
 
 3. Install project:
+
 ```bash
 cd AIAssistant/normalragwebserach
 pip install -e .
 ```
 
 4. Configure environment:
-Create `.env` file in the normalragwebserach directory:
+   Create `.env` file in the normalragwebserach directory:
+
 ```bash
 OPENAI_API_KEY=your_openai_api_key_here
 SERPER_API_KEY=your_serper_api_key_here
@@ -41,10 +46,12 @@ MODEL=gpt-4-0125-preview
 ```
 
 ### Run Application
+
 ```bash
 conda activate normalragwebserach
 streamlit run src/normalragwebserach/ui.py
 ```
+
 Access at http://localhost:8501
 
 ## Features
@@ -61,16 +68,17 @@ Access at http://localhost:8501
 ### Agents
 
 1. **Conversation Agent**
+
    - Primary coordinator
    - Query analysis
    - Response formatting
-
 2. **Knowledge Base Expert**
+
    - Local database operations
    - Customer data retrieval
    - Documentation search
-
 3. **Web Research Expert**
+
    - Internet searches
    - Content retrieval
    - Source verification
@@ -78,21 +86,22 @@ Access at http://localhost:8501
 ### Query Types
 
 1. **Knowledge Base Queries**
+
    - Customer information
    - Product details
    - Documentation
-
 2. **Web Search Queries**
+
    - Current events
    - General information
    - Research topics
-
 3. **Coding Questions**
+
    - Technical help
    - Implementation guidance
    - Code examples
-
 4. **Conversational**
+
    - General chat
    - Opinions
    - Assistance
@@ -100,6 +109,7 @@ Access at http://localhost:8501
 ## Technical Implementation
 
 ### Task Flow
+
 1. Query Analysis → query_analysis.md
 2. Information Retrieval (based on type):
    - Knowledge Base Search → knowledge_output.md
@@ -107,6 +117,7 @@ Access at http://localhost:8501
 3. Response Generation → conversation_output.md
 
 ### CrewAI Integration
+
 ```python
 # Two-Phase Execution
 1. Analysis Phase:
@@ -122,6 +133,7 @@ Access at http://localhost:8501
 ## Customization
 
 Modify these files to customize behavior:
+
 - `src/normalragwebserach/config/agents.yaml`: Agent definitions
 - `src/normalragwebserach/config/tasks.yaml`: Task configurations
 - `src/normalragwebserach/crew.py`: Core logic
@@ -130,6 +142,7 @@ Modify these files to customize behavior:
 ## Performance Optimization
 
 For better performance:
+
 ```bash
 xcode-select --install  # macOS only
 pip install watchdog
@@ -141,3 +154,56 @@ pip install watchdog
 - [GitHub Repository](https://github.com/joaomdmoura/crewai)
 - [Discord Community](https://discord.com/invite/X4JWnZnxPb)
 - [Documentation Chat](https://chatg.pt/DWjSBZn)
+
+## Video Demonstration
+
+### Project Overview Video
+
+[![AI Assistant with CrewAI Demo](https://img.youtube.com/vi/ynj92SLfJhI/0.jpg)](https://youtu.be/ynj92SLfJhI)
+
+Watch the full demonstration: [AI Assistant with CrewAI - Demo Video](https://youtu.be/ynj92SLfJhI)
+
+## YouTube Video Description
+
+```
+🤖 AI Assistant with CrewAI - Multi-Agent System for Intelligent Search and Conversation
+═══════════════════════════════════════════════════════
+
+Discover our powerful AI Assistant that combines knowledge base search, web research, and intelligent conversation capabilities using CrewAI framework!
+
+🎯 What This Project Does:
+• Intelligent query processing with multiple specialized AI agents
+• Local knowledge base search for quick information retrieval
+• Real-time web research capabilities
+• Interactive conversation handling
+• Beautiful Streamlit-based user interface
+
+
+🛠 Tech Stack:
+• Python 3.11
+• CrewAI Framework
+• OpenAI GPT-4
+• Streamlit
+• Serper API
+
+🔗 Important Links:
+→ GitHub Repository: https://github.com/vinoth12940/AIAssistant
+→ CrewAI Documentation: https://docs.crewai.com
+→ Project Wiki: https://github.com/vinoth12940/AIAssistant/wiki
+→ Video Demo: https://youtu.be/ynj92SLfJhI
+
+📦 Requirements:
+• Python >=3.10 <3.13
+• OpenAI API Key
+• Serper API Key
+• Git & Conda
+
+#AIAssistant #CrewAI #Python #OpenAI #WebResearch #ArtificialIntelligence #Programming #Tech #Software #GitHub
+
+✨ Like, Subscribe, and Star our GitHub repository for more updates!
+
+📝 Related Resources:
+• OpenAI Platform: https://platform.openai.com
+• Serper API: https://serper.dev
+• Streamlit: https://streamlit.io
+```
