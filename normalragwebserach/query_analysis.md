@@ -1,1 +1,1 @@
-``` TYPE: WEB_SEARCH REASON: The user's query asks for the latest news in Tamil Nadu, which involves seeking current events and public information, thus requiring a web search response. ```
+``` TYPE: CODING REASON: The user is inquiring about how to include a video in a markdown (.md) file, which involves technical knowledge of markdown syntax and is related to coding or formatting content within markdown files. ```

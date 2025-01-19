@@ -8,9 +8,18 @@ def extract_response(result):
         # Convert result to string and clean it up
         response = str(result).strip()
         
-        # If it's a knowledge base result, return as is
-        if '```' in response and any(field in response for field in ['First Name:', 'Last Name:', 'Phone:', 'Country:']):
-            return response
+        # If it's a knowledge base result, format it nicely
+        if '```' in response and any(field in response for field in ['Index,Customer Id,First Name']):
+            # Extract CSV data
+            csv_data = response.split('```')[1].strip()
+            headers = csv_data.split('\n')[0].split(',')
+            values = csv_data.split('\n')[1].split(',')
+            
+            # Create formatted response
+            formatted_response = "**Customer Information:**\n\n"
+            for header, value in zip(headers, values):
+                formatted_response += f"**{header.strip()}:** {value.strip()}\n"
+            return formatted_response
             
         # For analysis results, only return if explicitly requested
         if 'TYPE:' in response and 'REASON:' in response:
@@ -45,7 +54,7 @@ def run_ui():
         :root {
             --primary-bg: #1E1E1E;
             --secondary-bg: #2D2D2D;
-            --chat-bg: #383838;
+            --chat-bg: #1E1E1E;
             --user-msg-bg: #2B5C34;
             --bot-msg-bg: #1E3A8A;
             --text-color: #FFFFFF;
@@ -86,27 +95,53 @@ def run_ui():
             background: transparent !important;
             padding: 1rem;
             margin: 1rem 0;
-            border-radius: 15px;
             color: var(--text-color);
         }
 
-        /* User message */
+        /* User message container - move entire container to right */
         [data-testid="stChatMessage"][data-testid="user"] {
-            background: var(--user-msg-bg) !important;
-            margin-left: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex !important;
+            flex-direction: row-reverse !important;
+            width: 100% !important;
         }
 
-        /* Assistant message */
+        [data-testid="stChatMessage"][data-testid="user"] > div:first-child {
+            margin-left: auto !important;
+            margin-right: 0 !important;
+        }
+
+        /* Keep rest of the styling same */
+        [data-testid="stChatMessage"][data-testid="user"] > div {
+            background: var(--secondary-bg) !important;
+            border-radius: 15px !important;
+            padding: 0.8rem 1rem;
+            max-width: 80%;
+        }
+
+        /* Assistant message - align to left */
         [data-testid="stChatMessage"][data-testid="assistant"] {
-            background: var(--bot-msg-bg) !important;
-            margin-right: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+        }
+        
+        [data-testid="stChatMessage"][data-testid="assistant"] .stMarkdown {
+            background: var(--chat-bg) !important;
+            border-radius: 20px !important;
+            padding: 0.8rem 1rem;
+            display: inline-block;
+            max-width: 80%;
+            text-align: left;
+        }
+
+        /* Hide avatars */
+        [data-testid="stChatMessage"] .avatar {
+            display: none !important;
         }
 
         /* Input container */
         .stChatInputContainer {
-            background-color: var(--input-bg);
+            background-color: var(--chat-bg);
             padding: 1rem;
             border-radius: 10px;
             margin-top: 2rem;
@@ -199,6 +234,25 @@ def run_ui():
             border-radius: 50%;
             border: 2px solid var(--accent);
         }
+
+        /* Add this new CSS rule for the bottom block container */
+        [data-testid="stBottomBlockContainer"] {
+            background-color: var(--chat-bg) !important;
+        }
+
+        /* Add this CSS at the top with your other styles */
+        [data-testid="stChatMessage"][data-testid="user"] {
+            margin-left: auto !important;
+            width: fit-content !important;
+        }
+
+        [data-testid="stChatMessage"][data-testid="user"] {
+            flex-direction: row-reverse !important;
+            margin-left: auto;
+        }
+        [data-testid="stChatMessage"][data-testid="user"] .stMarkdown {
+            width: 100%;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -231,7 +285,7 @@ def run_ui():
         st.session_state.crew = Normalragwebserach()
 
     # Main chat container
-    st.markdown("<div class='main-container'>", unsafe_allow_html=True)
+    #st.markdown("<div class='main-container'>", unsafe_allow_html=True)
 
     # Welcome message
     if not st.session_state.chat_history:
@@ -244,16 +298,27 @@ def run_ui():
             </div>
         """, unsafe_allow_html=True)
 
-    # Chat messages
+    # Chat messages from history
     for message in st.session_state.chat_history:
         role, content = message
-        with st.chat_message(role, avatar="👤" if role == "user" else "🤖"):
-            st.markdown(f"<div style='color: white;'>{content}</div>", unsafe_allow_html=True)
+        if role == "user":
+            with st.chat_message(role):
+                st.markdown(content)  # Just display the content, let Streamlit handle the layout
+        else:
+            with st.chat_message(role):
+                st.markdown(f"""<div style="background-color: #383838; padding: 10px 15px; border-radius: 15px;">
+                    {content}
+                </div>""", unsafe_allow_html=True)
 
-    # Chat input
+    # Chat input and new messages
     if prompt := st.chat_input("Type your message here..."):
-        with st.chat_message("user", avatar="👤"):
-            st.markdown(f"<div style='color: white;'>{prompt}</div>", unsafe_allow_html=True)
+        # Display user message
+        with st.chat_message("user"):
+            st.markdown(f"""<div style="display: flex; justify-content: flex-end; width: 100%;">
+                <div style="background-color: #2D2D2D; padding: 10px 15px; border-radius: 15px; max-width: 80%;">
+                    {prompt}
+                </div>
+            </div>""", unsafe_allow_html=True)
         st.session_state.chat_history.append(("user", prompt))
 
         try:
@@ -263,8 +328,13 @@ def run_ui():
                 if not response or response.isspace():
                     response = "I apologize, but I couldn't generate a proper response. Please try asking your question in a different way."
             
-            with st.chat_message("assistant", avatar="🤖"):
-                st.markdown(f"<div style='color: white;'>{response}</div>", unsafe_allow_html=True)
+            # Display assistant message
+            with st.chat_message("assistant"):
+                st.markdown(f"""<div style="display: flex; justify-content: flex-start; width: 100%;">
+                    <div style="background-color: #383838; padding: 10px 15px; border-radius: 15px; max-width: 80%;">
+                        {response}
+                    </div>
+                </div>""", unsafe_allow_html=True)
             st.session_state.chat_history.append(("assistant", response))
 
         except Exception as e:
@@ -273,6 +343,30 @@ def run_ui():
             st.session_state.chat_history.append(("assistant", error_msg))
 
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # Add this CSS for user messages, keep all other CSS unchanged
+    st.markdown("""
+        <style>
+            [data-testid="stChatMessage"][data-testid="user"] {
+                flex-direction: row-reverse !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Add this CSS at the end of run_ui() function
+    st.markdown("""
+        <style>
+        .stChatMessage:has([data-testid="stChatMessageAvatarUser"]) {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: end;
+        }
+
+        [data-testid="stChatMessageAvatarUser"] + [data-testid="stChatMessageContent"] {
+            text-align: right;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     run_ui() 
